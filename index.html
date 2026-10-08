@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ANR PICSONDE — Picometer OFI Sensor on Chip</title>
+<style>
+  :root{
+    --navy:#0e2a47; --blue:#1f6fd6; --teal:#0a7a6d; --accent:#e8622d;
+    --bg:#f7f9fc; --card:#ffffff; --ink:#182333; --muted:#5a6a80; --line:#dfe6ef;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6;}
+  a{color:var(--blue); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+
+  /* NAV */
+  nav{position:sticky; top:0; z-index:50; background:rgba(14,42,71,.96); backdrop-filter:blur(6px);}
+  nav .wrap{display:flex; align-items:center; gap:24px; height:56px;}
+  nav .brand{color:#fff; font-weight:700; letter-spacing:.5px;}
+  nav .brand span{color:#7fb4ff;}
+  nav .links{display:flex; gap:18px; flex-wrap:wrap; margin-left:auto; align-items:center;}
+  nav .projectlogo{height:40px; width:auto;}
+  nav .anrlogo{height:34px; background:#fff; border-radius:5px; padding:3px 8px;}
+  header .hero-illus{width:100%; margin-top:40px; background:#fff; border-radius:14px; padding:18px; border:1px solid rgba(255,255,255,.2); box-shadow:0 8px 30px rgba(0,0,0,.25);}
+  header .figure-note{color:#b9cdea;}
+  nav a.navlink{color:#cfe0ff; font-size:.85rem; padding:4px 2px; border-bottom:2px solid transparent;}
+  nav a.navlink:hover{color:#fff; border-color:var(--accent); text-decoration:none;}
+
+  /* HERO */
+  header{background:linear-gradient(135deg,var(--navy) 0%, #123a63 55%, #0e5560 100%); color:#fff; padding:72px 0 88px; position:relative; overflow:hidden;}
+  header .badge{display:inline-block; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); padding:4px 12px; border-radius:999px; font-size:.75rem; letter-spacing:1px; text-transform:uppercase;}
+  header h1{font-size:2.6rem; margin:18px 0 8px; letter-spacing:-.5px;}
+  header h1 .grad{color:#7fb4ff;}
+  header p.sub{max-width:680px; color:#d9e6ff; font-size:1.05rem;}
+  header .meta{margin-top:22px; display:flex; gap:26px; flex-wrap:wrap; font-size:.85rem; color:#b9cdea;}
+  header .meta b{color:#fff;}
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:44px;}
+  .stat{background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:18px 16px;}
+  .stat .v{font-size:1.55rem; font-weight:800; color:#fff;}
+  .stat .l{font-size:.75rem; color:#b9cdea; margin-top:4px;}
+
+  /* SECTIONS */
+  section{padding:64px 0;}
+  section h2{font-size:1.7rem; color:var(--navy); margin-bottom:8px;}
+  section h2 .num{color:var(--accent); font-weight:800; margin-right:10px; font-size:1.2rem;}
+  section .lead{color:var(--muted); max-width:760px; margin-bottom:28px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; box-shadow:0 1px 3px rgba(16,36,64,.05);}
+  .card h3{color:var(--navy); font-size:1.05rem; margin-bottom:8px;}
+  .card p{font-size:.92rem; color:#33445c;}
+
+  .feat{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:8px;}
+  .feat .card{border-top:3px solid var(--blue);}
+  .feat .card:nth-child(2){border-top-color:var(--teal);}
+  .feat .card:nth-child(3){border-top-color:var(--accent);}
+  .feat .card:nth-child(4){border-top-color:#7a4fd6;}
+  .feat .card:nth-child(5){border-top-color:#c9a227;}
+  .feat .card:nth-child(6){border-top-color:#0e7fbf;}
+  .tag{display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.5px; color:var(--blue); background:#e8f1fd; border-radius:999px; padding:2px 10px; margin-bottom:10px; text-transform:uppercase;}
+
+  /* PUBLICATIONS */
+  .filters{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
+  .filters button{border:1px solid var(--line); background:#fff; color:var(--muted); padding:7px 16px; border-radius:999px; font-size:.82rem; cursor:pointer; font-family:inherit;}
+  .filters button.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+  .pub{background:var(--card); border:1px solid var(--line); border-left:3px solid var(--blue); border-radius:10px; padding:14px 18px; margin-bottom:12px; display:flex; gap:16px; align-items:flex-start;}
+  .pub.conf{border-left-color:var(--teal);}
+  .pub.data{border-left-color:var(--accent);}
+  .pub .yr{flex:0 0 46px; text-align:center; font-weight:800; color:var(--navy); font-size:1.05rem; background:#eef3fa; border-radius:8px; padding:6px 0; align-self:flex-start;}
+  .pub .body h4{font-size:.93rem; color:var(--ink); font-weight:600; margin-bottom:2px;}
+  .pub .body .venue{font-size:.8rem; color:var(--teal); font-weight:600; font-style:italic;}
+  .pub .body .auth{font-size:.78rem; color:var(--muted); margin:4px 0;}
+  .pub .body .doilink{font-size:.75rem;}
+  .pub.hidden{display:none;}
+
+  /* CONSORTIUM */
+  .partners{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+  .partner{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; text-align:center;}
+  .partner .logo{font-weight:800; font-size:1.15rem; color:var(--navy);}
+  .partner .role{font-size:.72rem; text-transform:uppercase; letter-spacing:1px; color:var(--accent); margin:6px 0 10px; font-weight:700;}
+  .partner ul{list-style:none; font-size:.8rem; color:#33445c;}
+  .partner ul li{padding:1px 0;}
+
+  /* GALLERY */
+  .gal{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .gal .card{padding:12px;}
+  .gal .cap{font-size:.8rem; color:var(--muted); padding:10px 6px 4px;}
+  .gal .card img{width:100%; height:auto; display:block; border-radius:8px; background:#eef3fa;}
+  .gal svg{width:100%; height:auto; display:block; border-radius:8px;}
+
+  /* OUTREACH */
+  .outreach{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+
+  footer{background:var(--navy); color:#9db7d8; padding:36px 0; font-size:.82rem; margin-top:40px;}
+  footer .wrap{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap;}
+  footer b{color:#fff;}
+
+  .figure-note{font-size:.75rem; color:var(--muted); margin-top:8px; font-style:italic;}
+
+  @media (max-width:860px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .feat{grid-template-columns:1fr;}
+    .partners{grid-template-columns:repeat(2,1fr);}
+    .gal{grid-template-columns:1fr;}
+    .grid2{grid-template-columns:1fr;}
+    .outreach{grid-template-columns:1fr;}
+    header h1{font-size:1.9rem;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">
+      <img class="projectlogo" src="images/logo-picsonde.png" alt="ANR PICSONDE project logo"/>
+    </div>
+    <div class="links">
+      <a class="navlink" href="#concept">Concept</a>
+      <a class="navlink" href="#results">Results</a>
+      <a class="navlink" href="#pubs">Publications</a>
+      <a class="navlink" href="#consortium">Consortium</a>
+      <a class="navlink" href="#gallery">Gallery</a>
+      <a class="navlink" href="#outreach">Outreach</a>
+    </div>
+    <img class="anrlogo" src="images/anr-logo.png" alt="ANR — Agence Nationale de la Recherche"/>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="badge">ANR-20-CE42-00010 · Completed project</span>
+     <div class="card" style="margin-top: 20px;">
+       <img class="projectlogo" src="images/logo-picsonde.png" alt="ANR PICSONDE project logo" width="600"/>
+     </div> 
+    <h1>PICSONDE<br/><span class="grad">
+        Picometer OFI sensing, from laser to chip</span></h1>
+    <p class="sub">An embedded displacement and vibration sensor based on optical feedback interferometry (OFI), combining a photonic integrated circuit (PIC) — capturing the FM channel of the OFI signal — with a system-on-chip (SoC) for real-time signal processing, targeting quantum-limited resolution for experimental modal analysis and predictive maintenance.</p>
+    <div class="meta">
+      <div>Coordinator: <b>Olivier Bernal</b> — LAAS-CNRS</div>
+      <div>2021 – 2025</div>
+      <div>Partners: LAAS-CNRS · LAUM-ESEO · Univ. Glasgow · ACOEM</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v">1 pm/√Hz</div><div class="l">demonstrated noise PSD above 5 kHz (PIC FM channel)</div></div>
+      <div class="stat"><div class="v">×100</div><div class="l">resolution improvement  vs AM-channel OFI systems</div></div>
+      <div class="stat"><div class="v">10 kHz</div><div class="l"> bandwidth for real-time modal analysis</div></div>
+      <div class="stat"><div class="v">15</div><div class="l">outputs: journals, conferences &amp; open dataset</div></div>
+    </div>
+    <p class="figure-note" style="color:#b9cdea;">Overview of the PICSONDE sensor: OFI signal from the vibrating target, on-chip FM-to-AM conversion (ring resonator / Mach–Zehnder), dithering, and real-time C &amp; displacement retrieval by the SoC.</p>
+  </div>
+</header>
+
+<!-- ================= CONCEPT ================= -->
+<section id="concept">
+  <div class="wrap">
+    <h2><span class="num">01</span>The concept</h2>
+    <p class="lead">In optical feedback interferometry, a fraction of the light backscattered by a remote target re-enters the laser cavity. The laser diode becomes a self-aligned micro-interferometer: source, interferometer and detector in a single package. PICSONDE pushed this principle onto a photonic chip.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Four technological barriers, solved together</h3>
+        <p style="margin-bottom:10px;">The project identified and addressed the four locks preventing OFI sensors from reaching quantum-limited performance on real, speckle-affected targets:</p>
+        <p><b>1. High dynamic-range OFI acquisition</b> — exploiting the FM channel, limited by the laser linewidth instead of shot noise, through on-chip FM-to-AM conversion.</p>
+        <p><b>2. Non-linear OFI signal retrieval</b> — modelling OFI as an inherent non-uniform sampling (NUS) system, directly processed by the SoC.</p>
+        <p><b>3. Real-time assessment of the feedback factor C</b> — direct and AI-based estimators, plus active control with an integrated variable optical attenuator (VOA).</p>
+        <p><b>4. Fringe detection under speckle</b> — deep-network fringe detection robust on unseen experimental signals.</p>
+      </div>
+      <div class="card">
+        <h3>Architecture of the PICSONDE sensor</h3>
+    		<img class="hero-illus" src="images/illustration-picsonde.png" alt="PICSONDE system overview: target, laser, PIC chip (ring resonator, Mach-Zehnder, photodiode), dithering and SoC processing chain" width="500"/>
+        <p class="figure-note">Schematic of the PICSONDE sensor: laser diode, SiN PIC performing FM-to-AM conversion and C-control, and the processing SoC.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<section id="results" style="background:#eef3fa;">
+  <div class="wrap">
+    <h2><span class="num">02</span>Key results</h2>
+    <p class="lead">PICSONDE delivered the first photonic-integrated OFI displacement sensor exploiting the FM channel, validated experimentally on speckle-affected targets and driven in real time by an embedded SoC.</p>
+    <div class="feat">
+      <div class="card">
+        <span class="tag">Photonic integration</span>
+        <h3>FM-to-AM conversion on a SiN chip</h3>
+        <p>Integrated Mach–Zehnder interferometers and micro-ring resonators demonstrated as in-chip frequency discriminators for the OFI FM channel, achieving <b>1 pm/√Hz noise PSD above 5 kHz</b> — published in <i>Journal of Lightwave Technology</i> (2024), with integrated electro-thermo-optic modulation of the SiN filters characterized in <i>Photonics</i> (2026).</p>
+      </div>
+      <div class="card">
+        <span class="tag">Feedback control</span>
+        <h3>Toward active control of the feedback factor C</h3>
+        <p>A PIC-integrated variable optical attenuator provides robust OFI operation under variable feedback, rather than merely compensating C in software — published in <i>Optics Express</i> (2025).</p>
+      </div>
+      <div class="card">
+        <span class="tag">Signal processing</span>
+        <h3>Non-uniform sampling beyond dynamic-range limits</h3>
+        <p>The OFI signal is treated as an inherent event-based, non-uniform sampling system, lifting the displacement dynamic-range constraint of closed-loop approaches — with zero-crossing NUS integration in <i>IEEE Sensors Journal</i> (2023).</p>
+      </div>
+      <div class="card">
+        <span class="tag">AI × OFI</span>
+        <h3>Deep networks for fringe detection &amp; C estimation</h3>
+        <p>Augmentation-assisted deep networks achieve robust fringe detection on unseen experimental signals; neural estimators retrieve C across feedback regimes — <i>IEEE TIM</i> (2023, 2025), <i>Sensors</i> (2022), <i>Applied Optics</i> (2025).</p>
+      </div>
+      <div class="card">
+        <span class="tag">Open science</span>
+        <h3>Open dataset</h3>
+        <p>Experimental speckle-affected OFI signals with reference C values released on Zenodo, enabling reproducible benchmarking of fringe-detection and C-estimation algorithms.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Industrial validation</span>
+        <h3>Embedded prototype &amp; in-situ tests</h3>
+        <p>The laser + PIC were succesfully assembled via a fiber array. The signal processing is not yet embedded in an SoC. Next step will consist in developping real-time algorithm on SoC and finally to evaluate the complete system toward real-time experimental modal analysis, with end-user ACOEM for predictive maintenance scenarios.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PUBLICATIONS ================= -->
+<section id="pubs">
+  <div class="wrap">
+    <h2><span class="num">03</span>Publications</h2>
+    <p class="lead">11 journal articles, 3 conference papers and 1 open dataset. Filter by type below.</p>
+    <div class="filters">
+      <button class="active" data-f="all">All (15)</button>
+      <button data-f="journal">Journals (11)</button>
+      <button data-f="conf">Conferences (3)</button>
+      <button data-f="data">Dataset (1)</button>
+    </div>
+    <div id="publist">
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2026</div>
+        <div class="body">
+          <h4>Electro-thermo-optical modulation of silicon nitride integrated photonic filters for analog applications</h4>
+          <div class="venue">Photonics, 13(2), 149</div>
+          <div class="auth">C. Deleau, H.C. Seat, O. Bernal, F. Surre</div>
+          <div class="doilink"><a href="https://doi.org/10.3390/photonics13020149" target="_blank" rel="noopener">doi:10.3390/photonics13020149</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2025</div>
+        <div class="body">
+          <h4>Robust integrated optical feedback interferometry via variable optical attenuation</h4>
+          <div class="venue">Optics Express, 33(8), 17566–17579</div>
+          <div class="auth">A. Arshad, O.D. Bernal, U. Zabit, et al.</div>
+          <div class="doilink"><a href="https://doi.org/10.1364/OE.550127" target="_blank" rel="noopener">doi:10.1364/OE.550127</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2025</div>
+        <div class="body">
+          <h4>Efficient computation of laser self-mixing sensor signal under variable optical feedback</h4>
+          <div class="venue">IEEE Sensors Journal</div>
+          <div class="auth">S.M. Muslim, O.D. Bernal, U. Zabit</div>
+          <div class="doilink"><a href="https://doi.org/10.1109/JSEN.2025.3581469" target="_blank" rel="noopener">doi:10.1109/JSEN.2025.3581469</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2025</div>
+        <div class="body">
+          <h4>Estimation of variable optical feedback coupling factor for self-mixing interferometry by signal-to-image translation</h4>
+          <div class="venue">Applied Optics, 64(26), 7788–7798</div>
+          <div class="auth">A.A. Siddiqui, O.D. Bernal, U. Zabit, et al.</div>
+          <div class="doilink"><a href="https://doi.org/10.1364/AO.567935" target="_blank" rel="noopener">doi:10.1364/AO.567935</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2025</div>
+        <div class="body">
+          <h4>Neural network-based estimation of optical feedback factor in self-mixing interferometry systems across various feedback regimes</h4>
+          <div class="venue">IEEE Transactions on Instrumentation and Measurement, 74</div>
+          <div class="auth">M. Feuilloy, G. Plantier, F. Jayat, O. Bernal</div>
+          <div class="doilink"><a href="https://doi.org/10.1109/TIM.2025.3580871" target="_blank" rel="noopener">doi:10.1109/TIM.2025.3580871</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2024</div>
+        <div class="body">
+          <h4>Optical feedback FM-to-AM conversion with photonic integrated circuits for displacement sensing applications</h4>
+          <div class="venue">Journal of Lightwave Technology, 42(9)</div>
+          <div class="auth">C. Deleau, H.C. Seat, F. Surre, U. Zabit, P.F. Calmon, F. Carcenac, T. Bosch, O.D. Bernal</div>
+          <div class="doilink"><a href="https://doi.org/10.1109/JLT.2024.3355048" target="_blank" rel="noopener">doi:10.1109/JLT.2024.3355048</a> — <b>flagship result: 1 pm/√Hz above 5 kHz</b></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2023</div>
+        <div class="body">
+          <h4>Augmentation assisted robust fringe detection on unseen experimental signals applied to optical feedback interferometry using a deep network</h4>
+          <div class="venue">IEEE Transactions on Instrumentation and Measurement</div>
+          <div class="auth">S.S. Khurshid, W. Hussain, U. Zabit, O.D. Bernal</div>
+          <div class="doilink"><a href="https://doi.org/10.1109/TIM.2023.3251409" target="_blank" rel="noopener">doi:10.1109/TIM.2023.3251409</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2023</div>
+        <div class="body">
+          <h4>Integration of zero crossing method in a non-uniform sampling system using optical feedback interferometry</h4>
+          <div class="venue">IEEE Sensors Journal</div>
+          <div class="auth">H.S. Bazaz, M.M. Fatimah, L. Asim, U. Zabit, O.D. Bernal</div>
+          <div class="doilink"><a href="https://doi.org/10.1109/JSEN.2023.3275702" target="_blank" rel="noopener">doi:10.1109/JSEN.2023.3275702</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2023</div>
+        <div class="body">
+          <h4>Direct estimation of the optical feedback factor C from the amplitude of the optical feedback interferometric signal</h4>
+          <div class="venue">IEEE Transactions on Instrumentation and Measurement</div>
+          <div class="auth">O.D. Bernal, H.C. Seat, U. Zabit, F. Surre</div>
+          <div class="doilink"><a href="https://doi.org/10.1109/TIM.2023.3300431" target="_blank" rel="noopener">doi:10.1109/TIM.2023.3300431</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2022</div>
+        <div class="body">
+          <h4>Fringe detection and displacement sensing for variable optical feedback-based self-mixing interferometry by using deep neural networks</h4>
+          <div class="venue">Sensors, 22(24), 9831</div>
+          <div class="auth">A.A. Siddiqui, U. Zabit, O.D. Bernal</div>
+          <div class="doilink"><a href="https://doi.org/10.3390/s22249831" target="_blank" rel="noopener">doi:10.3390/s22249831</a></div>
+        </div>
+      </div>
+
+      <div class="pub journal" data-t="journal">
+        <div class="yr">2021</div>
+        <div class="body">
+          <h4>Toward an estimation of the optical feedback factor C on the fly for displacement sensing</h4>
+          <div class="venue">Sensors, 21(10), 3528</div>
+          <div class="auth">O.D. Bernal, U. Zabit, F. Jayat, T. Bosch</div>
+          <div class="doilink"><a href="https://doi.org/10.3390/s21103528" target="_blank" rel="noopener">doi:10.3390/s21103528</a></div>
+        </div>
+      </div>
+
+      <div class="pub conf" data-t="conf">
+        <div class="yr">2023</div>
+        <div class="body">
+          <h4>Optical feedback FM-to-AM conversion with integrated micro-ring resonator for displacement sensing applications</h4>
+          <div class="venue">AIVELA — 15th Int. Conference on Vibration Measurements, Ancona, Italy</div>
+          <div class="auth">C. Deleau, H.C. Seat, F. Surre, U. Zabit, P.F. Calmon, O. Bernal</div>
+        </div>
+      </div>
+
+      <div class="pub conf" data-t="conf">
+        <div class="yr">2022</div>
+        <div class="body">
+          <h4>Non-uniform sampling theory applied to FM channel optical feedback interferometry for displacement sensors</h4>
+          <div class="venue">IEEE SENSORS 2022 Conference, Dallas, USA</div>
+          <div class="auth">O. Bernal, H.C. Seat, F. Surre, U. Zabit, C. Deleau, T. Bosch</div>
+          <div class="doilink"><a href="https://doi.org/10.1109/SENSORS52175.2022.9967106" target="_blank" rel="noopener">doi:10.1109/SENSORS52175.2022.9967106</a></div>
+        </div>
+      </div>
+
+      <div class="pub conf" data-t="conf">
+        <div class="yr">2022</div>
+        <div class="body">
+          <h4>Towards integrated optical feedback FM-to-AM conversion in silicon nitride for displacement sensing applications</h4>
+          <div class="venue">IEEE SENSORS 2022 Conference, Dallas, USA</div>
+          <div class="auth">C. Deleau, T. Apiphatnaphakul, H.C. Seat, F. Surre, U. Zabit, F. Carcenac, P.F. Calmon, T. Bosch, O. Bernal</div>
+          <div class="doilink"><a href="https://doi.org/10.1109/SENSORS52175.2022.9967153" target="_blank" rel="noopener">doi:10.1109/SENSORS52175.2022.9967153</a></div>
+        </div>
+      </div>
+
+      <div class="pub data" data-t="data">
+        <div class="yr">2023</div>
+        <div class="body">
+          <h4>Estimation of the optical feedback factor C — experimental OFI dataset</h4>
+          <div class="venue">Zenodo, open dataset</div>
+          <div class="auth">O. Bernal, H.C. Seat, F. Surre, U. Zabit</div>
+          <div class="doilink"><a href="https://doi.org/10.5281/zenodo.7737315" target="_blank" rel="noopener">doi:10.5281/zenodo.7737315</a></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONSORTIUM ================= -->
+<section id="consortium" style="background:#eef3fa;">
+  <div class="wrap">
+    <h2><span class="num">04</span>Consortium</h2>
+    <p class="lead">A multidisciplinary team combining photonic integration, OFI signal processing, modelling and industrial instrumentation.</p>
+    <div class="partners">
+      <div class="partner">
+        <div class="logo">LAAS-CNRS</div>
+        <div class="role">Coordinator — Toulouse, FR</div>
+        <ul>
+          <li><b>O. Bernal</b> (coordinator)</li>
+          <li>T. Bosch (Prof.)</li>
+          <li>H.C. Seat (Assoc. Prof.)</li>
+          <li>H. Tap (Prof.)</li>
+          <li>F. Jayat (Research Eng.)</li>
+          <li>C. Tronche (Research Eng.)</li>
+          <li style="color:#8aa">PIC design &amp; cleanroom fabrication, sensor test</li>
+        </ul>
+      </div>
+      <div class="partner">
+        <div class="logo">LAUM–ESEO</div>
+        <div class="role">Partner — Le Mans / Angers, FR</div>
+        <ul>
+          <li><b>M. Feuilloy</b> (scientific leader)</li>
+          <li>G. Plantier (Prof.)</li>
+          <li style="color:#8aa">OFI physical modelling, real-time &amp; neural-network processing</li>
+        </ul>
+      </div>
+      <div class="partner">
+        <div class="logo">Univ. of Glasgow</div>
+        <div class="role">Partner — Glasgow, UK</div>
+        <ul>
+          <li><b>F. Surre</b> (Assoc. Prof.)</li>
+          <li style="color:#8aa">Photonic modelling, bio-sensing perspectives</li>
+        </ul>
+      </div>
+      <div class="partner">
+        <div class="logo">ACOEM</div>
+        <div class="role">Industrial partner — FR</div>
+        <ul>
+          <li><b>T. Mazoyer</b></li>
+          <li style="color:#8aa">End-user requirements, predictive-maintenance validation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section id="gallery">
+  <div class="wrap">
+    <h2><span class="num">05</span>Gallery</h2>
+    <p class="lead">Figures from the project's publications and experiments.</p>
+    <!-- FILE MAPPING — place renamed images in an "images/" folder next to this HTML:
+         images/logo-picsonde.png          ← LogoPicsonde_0_0.png  (project logo)
+         images/illustration-picsonde.png  ← llustration_PICSONDE.png  (hero: system overview)
+         images/anr-logo.png               ← 9e39a716-4b31-408b-94f2-3af40901e6ac1.png  (logo ANR)
+         images/fig-fmtoam-scheme.gif      ← delea1-3355048-small.gif
+         images/fig-amfm-scope.png         ← FM_AM_conversion-1.png
+         images/fig-mzi-fiberarray.gif     ← 9967153-fig-3-source-small.gif
+         images/fig-pic-mrr.jpg            ← PIC_Electro_1-2.jpg
+         images/fig-pic-mzi-views.jpg      ← PIC_Electro_2.jpg
+         images/fig-setup.jpg              ← FM_AM_Conversion_Principle-1-scaled.jpg
+         images/fig-c-estimation.jpg       ← sensors-21-03528-g023-550.jpg
+    -->
+    <div class="gal">
+      <div class="card">
+        <img src="images/fig-fmtoam-scheme.gif" alt="OFI sensing scheme with integrated optical filter performing FM-to-AM conversion"/>
+        <div class="cap"><b>FM-to-AM conversion scheme</b> — OFI sensing with the laser diode and the integrated optical filter converting the FM channel into amplitude modulation (<i>J. Lightwave Technol.</i> 2024).</div>
+      </div>
+      <div class="card">
+        <img src="images/fig-amfm-scope.png" alt="AM and FM OFI signals captured on an oscilloscope"/>
+        <div class="cap"><b>AM vs FM channels</b> — oscilloscope captures: the FM channel, demodulated on-chip, offers a far better noise floor than the conventional AM channel.</div>
+      </div>
+      <div class="card">
+        <img src="images/fig-mzi-fiberarray.gif" alt="2-cm imbalanced Mach-Zehnder interferometer on the SiN chip with fiber array"/>
+        <div class="cap"><b>2-cm imbalanced MZI</b> — the silicon nitride photonic chip with its grating couplers and fiber array on the optical table (IEEE Sensors 2022).</div>
+      </div>
+      <div class="card">
+        <img src="images/fig-pic-mrr.jpg" alt="Fiber alignment on Ti pads and micro-ring router on the SiN PIC"/>
+        <div class="cap"><b>PIC close-up</b> — fiber alignment on titanium pads and the micro-ring router on the fabricated SiN chip.</div>
+      </div>
+      <div class="card">
+        <img src="images/fig-pic-mzi-views.jpg" alt="Microscope views of the PIC: grating couplers, heaters and MZI arm"/>
+        <div class="cap"><b>PIC microscope views</b> — grating couplers, thermo-optic heaters/electrodes and the long arm of the Mach–Zehnder interferometer.</div>
+      </div>
+      <div class="card">
+        <img src="images/fig-setup.jpg" alt="Experimental setup with laser diode, isolator, beam splitter and PZT target"/>
+        <div class="cap"><b>Experimental setup</b> — laser diode, isolator, beam splitter, photodiode and vibrating PZT target used to validate the sensor.</div>
+      </div>
+      <div class="card">
+        <img src="images/fig-c-estimation.jpg" alt="Speckle-affected OFI signal and on-the-fly estimation of the feedback factor C"/>
+        <div class="cap"><b>Feedback factor C estimation</b> — speckle-affected OFI signal and on-the-fly C estimation, released as an open dataset (<i>Sensors</i> 2021, Zenodo).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="outreach" style="background:#eef3fa;">
+  <div class="wrap">
+    <h2><span class="num">06</span>Outreach &amp; art–science</h2>
+    <p class="lead">PICSONDE was also a vehicle for scientific culture, through an art–science residency and an online exhibition on "seeing the invisible".</p>
+    <div class="outreach">
+      <div class="card">
+        <h3>Art &amp; Science residency — Sara Bensaltana</h3>
+        <p>Photography residency "la photographie vivante", co-supported with ANR CONNECT-2, exhibited at the Quai des savoirs, Toulouse (2025). The artist explored living photographic processes in resonance with the project's sensing of the invisible.</p>
+        <p style="margin-top:10px;"><a href="https://quaidessavoirs.toulouse-metropole.fr/2025/04/03/faire-de-la-photographie-vivante-sara-bensaltana/" target="_blank" rel="noopener">Exhibition page →</a></p>
+      </div>
+      <div class="card">
+        <h3>"À la recherche de l'invisible" — online exhibition</h3>
+        <p>A mini online exhibition about the research on invisible vibrations, hosted by Explorateur (Université de Toulouse), including an Instagram feature.</p>
+        <p style="margin-top:10px;"><a href="https://exploreur.univ-toulouse.fr/la-recherche-de-linvisible" target="_blank" rel="noopener">View the exhibition →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <img src="images/anr-logo.png" alt="ANR" style="height:42px; background:#fff; border-radius:5px; padding:4px 10px; margin-bottom:10px;"/><br/>
+      <b>ANR PICSONDE</b> · ANR-20-CE42-00010 · 2021–2025<br/>
+      Funded by the Agence Nationale de la Recherche (ANR), France.
+    </div>
+    <div>
+      Coordinator: <b>Olivier Bernal</b>, LAAS-CNRS, Toulouse<br/>
+      Partners: LAAS-CNRS · LAUM-ESEO · University of Glasgow · ACOEM
+    </div>
+  </div>
+</footer>
+
+<script>
+  const buttons = document.querySelectorAll('.filters button');
+  const pubs = document.querySelectorAll('.pub');
+  buttons.forEach(b => b.addEventListener('click', () => {
+    buttons.forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    const f = b.dataset.f;
+    pubs.forEach(p => p.classList.toggle('hidden', f !== 'all' && p.dataset.t !== f));
+  }));
+</script>
+</body>
+</html>
